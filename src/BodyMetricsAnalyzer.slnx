@@ -14,5 +14,7 @@
     <Project Path="CrossCutting.Configuration/CrossCutting.Configuration.csproj" />
     <Project Path="CrossCutting.Exception/CrossCutting.Exception.csproj" />
   </Folder>
-  <Folder Name="/5 - Test/" />
+  <Folder Name="/5 - Test/">
+    <Project Path="Testes.Unit/Testes.Unit.csproj" Id="996a5292-9147-457e-82c8-e910f155adb7" />
+  </Folder>
 </Solution>

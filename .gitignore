@@ -7,6 +7,10 @@
 *.userosscache
 *.sln.docstates
 
+# NuGet packages (old-style packages folder)
+/packages/
+/**/packages/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
