@@ -7,7 +7,9 @@ public sealed class OcrService
     private readonly string _tessdataPath =
         Path.Combine(AppContext.BaseDirectory, "tessdata");
 
-    public Task<string> ReadTextAsync(Bitmap image, CancellationToken cancellationToken = default)
+    public async Task<string> ReadTextAsync(
+        Image<Rgba32> image,
+        CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -18,9 +20,13 @@ public sealed class OcrService
 
         engine.DefaultPageSegMode = PageSegMode.SingleColumn;
 
-        using var pix = PixConverter.ToPix(image);
+        await using var ms = new MemoryStream();
+        await image.SaveAsync(ms, new PngEncoder(), cancellationToken);
+        ms.Position = 0;
+
+        using var pix = Pix.LoadFromMemory(ms.ToArray());
         using var page = engine.Process(pix);
 
-        return Task.FromResult(page.GetText());
+        return page.GetText();
     }
 }

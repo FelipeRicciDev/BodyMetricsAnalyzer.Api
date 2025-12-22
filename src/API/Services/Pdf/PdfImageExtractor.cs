@@ -2,14 +2,12 @@
 
 public sealed class PdfImageExtractor
 {
-    #region PDF Extraction
-    [SupportedOSPlatform("windows")]
-    public List<Bitmap> ExtractImages(Stream pdfStream)
+    public List<Image<Rgba32>> ExtractImages(Stream pdfStream)
     {
         using var memory = new MemoryStream();
         pdfStream.CopyTo(memory);
 
-        var images = new List<Bitmap>();
+        var images = new List<Image<Rgba32>>();
 
         using var reader = DocLib.Instance.GetDocReader(
             memory.ToArray(),
@@ -18,33 +16,39 @@ public sealed class PdfImageExtractor
         for (int i = 0; i < reader.GetPageCount(); i++)
         {
             using var page = reader.GetPageReader(i);
-            images.Add(CreateBitmap(page));
+            images.Add(CreateImage(page));
         }
 
         return images;
     }
-    #endregion
 
-    #region Bitmap Creation
-    [SupportedOSPlatform("windows")]
-    private static Bitmap CreateBitmap(IPageReader page)
+    private static Image<Rgba32> CreateImage(IPageReader page)
     {
-        var bitmap = new Bitmap(
+        var image = new Image<Rgba32>(
             page.GetPageWidth(),
-            page.GetPageHeight(),
-            PixelFormat.Format32bppArgb);
+            page.GetPageHeight());
 
         var raw = page.GetImage();
 
-        var data = bitmap.LockBits(
-            new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-            ImageLockMode.WriteOnly,
-            bitmap.PixelFormat);
+        image.ProcessPixelRows(accessor =>
+        {
+            int index = 0;
+            for (int y = 0; y < accessor.Height; y++)
+            {
+                var row = accessor.GetRowSpan(y);
+                for (int x = 0; x < row.Length; x++)
+                {
+                    row[x] = new Rgba32(
+                        raw[index + 2],
+                        raw[index + 1],
+                        raw[index],
+                        raw[index + 3]);
 
-        Marshal.Copy(raw, 0, data.Scan0, raw.Length);
-        bitmap.UnlockBits(data);
+                    index += 4;
+                }
+            }
+        });
 
-        return bitmap;
+        return image;
     }
-    #endregion
 }
