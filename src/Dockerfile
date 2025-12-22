@@ -14,17 +14,14 @@ RUN dotnet publish API/API.csproj -c Release -o /out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# 🔹 Instalar dependências nativas do Tesseract
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
-    libtesseract-dev \
+    tesseract-ocr-por \
     libleptonica-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 🔹 Copiar aplicação
 COPY --from=build /out .
 
-# 🔹 Copiar tessdata (idioma)
 COPY API/tessdata ./tessdata
 
 ENV ASPNETCORE_URLS=http://+:8080

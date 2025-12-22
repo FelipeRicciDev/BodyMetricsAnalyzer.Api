@@ -15,7 +15,6 @@ global using MediatR;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.OpenApi.Models;
 global using SixLabors.ImageSharp;
-global using SixLabors.ImageSharp.Formats.Png;
 global using SixLabors.ImageSharp.PixelFormats;
 global using System.Reflection;
 global using System.Text;

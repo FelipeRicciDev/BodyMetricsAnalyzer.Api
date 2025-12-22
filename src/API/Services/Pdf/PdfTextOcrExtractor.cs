@@ -11,13 +11,16 @@ public sealed class PdfTextOcrExtractor(
         Stream pdfStream,
         CancellationToken cancellationToken = default)
     {
-        var images = _pdfImageExtractor.ExtractImages(pdfStream);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var imageStreams =
+            _pdfImageExtractor.ExtractImagesAsStreams(pdfStream);
 
         var textBuilder = new StringBuilder();
 
-        foreach (var image in images)
+        foreach (var imageStream in imageStreams)
         {
-            var text = await _ocrService.ReadTextAsync(image, cancellationToken);
+            var text = _ocrService.ReadText(imageStream);
             textBuilder.AppendLine(text);
         }
 

@@ -2,12 +2,12 @@
 
 public sealed class PdfImageExtractor
 {
-    public List<Image<Rgba32>> ExtractImages(Stream pdfStream)
+    public List<Stream> ExtractImagesAsStreams(Stream pdfStream)
     {
         using var memory = new MemoryStream();
         pdfStream.CopyTo(memory);
 
-        var images = new List<Image<Rgba32>>();
+        var images = new List<Stream>();
 
         using var reader = DocLib.Instance.GetDocReader(
             memory.ToArray(),
@@ -16,7 +16,14 @@ public sealed class PdfImageExtractor
         for (int i = 0; i < reader.GetPageCount(); i++)
         {
             using var page = reader.GetPageReader(i);
-            images.Add(CreateImage(page));
+
+            var image = CreateImage(page);
+
+            var imageStream = new MemoryStream();
+            image.SaveAsPng(imageStream);
+            imageStream.Position = 0;
+
+            images.Add(imageStream);
         }
 
         return images;
@@ -33,16 +40,19 @@ public sealed class PdfImageExtractor
         image.ProcessPixelRows(accessor =>
         {
             int index = 0;
+
             for (int y = 0; y < accessor.Height; y++)
             {
                 var row = accessor.GetRowSpan(y);
+
                 for (int x = 0; x < row.Length; x++)
                 {
                     row[x] = new Rgba32(
                         raw[index + 2],
                         raw[index + 1],
                         raw[index],
-                        raw[index + 3]);
+                        raw[index + 3]
+                    );
 
                     index += 4;
                 }
