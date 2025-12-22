@@ -1,12 +1,11 @@
-# Etapa 1: build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 COPY . .
-RUN dotnet restore BodyMetricsAnalyzer.slnx
-RUN dotnet publish BodyMetricsAnalyzer.slnx -c Release -o /out
 
-# Etapa 2: runtime
+RUN dotnet restore API/API.csproj
+RUN dotnet publish API/API.csproj -c Release -o /out
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /out .
