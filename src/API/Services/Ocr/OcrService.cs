@@ -30,7 +30,17 @@ public sealed class OcrService
             };
 
             using var process = Process.Start(psi)!;
-            process.WaitForExit();
+
+            if (!process.WaitForExit(60_000))
+            {
+                try
+                {
+                    process.Kill(entireProcessTree: true);
+                }
+                catch { }
+
+                throw new TimeoutException("OCR processing timed out.");
+            }
 
             return File.Exists(tempOut + ".txt")
                 ? File.ReadAllText(tempOut + ".txt")
