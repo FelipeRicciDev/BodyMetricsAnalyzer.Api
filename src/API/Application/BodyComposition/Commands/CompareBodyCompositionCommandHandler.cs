@@ -1,11 +1,14 @@
 ﻿namespace API.Application.BodyComposition.Commands;
 
 public sealed class CompareBodyCompositionCommandHandler(
-    IPdfTextExtractor pdfTextExtractor) : IRequestHandler<
+    IPdfTextExtractor pdfTextExtractor)
+    : IRequestHandler<
         CompareBodyCompositionCommand,
         BodyCompositionComparisonResponse>
 {
-    public async Task<BodyCompositionComparisonResponse> Handle(CompareBodyCompositionCommand request, CancellationToken cancellationToken)
+    public async Task<BodyCompositionComparisonResponse> Handle(
+        CompareBodyCompositionCommand request,
+        CancellationToken cancellationToken)
     {
         CompareBodyCompositionCommandValidator.Validate(request);
 
@@ -23,25 +26,21 @@ public sealed class CompareBodyCompositionCommandHandler(
         var examA = BodyCompositionAnalyzer.Analyze(textA);
         var examB = BodyCompositionAnalyzer.Analyze(textB);
 
-        var olderExam =
-            examA.Header.DataExame <= examB.Header.DataExame
-                ? examA
-                : examB;
+        var dateA = examA.Header.DataExame ?? DateTime.MinValue;
+        var dateB = examB.Header.DataExame ?? DateTime.MinValue;
 
-        var newerExam =
-            examA.Header.DataExame > examB.Header.DataExame
-                ? examA
-                : examB;
+        var olderExam = dateA <= dateB ? examA : examB;
+        var newerExam = dateA > dateB ? examA : examB;
 
         var (compositionComparison, scoreComparison) =
             BodyCompositionComparator.Compare(olderExam, newerExam);
 
         return new BodyCompositionComparisonResponse(
             User: new UserResponse(
-                Name: newerExam.Header.Nome!,
-                Age: newerExam.Header.Idade!.Value,
-                Sex: newerExam.Header.Sexo!,
-                Height: newerExam.Header.AlturaCm!.Value
+                Name: newerExam.Header.Nome ?? "Não identificado",
+                Age: newerExam.Header.Idade ?? 0,
+                Sex: newerExam.Header.Sexo ?? "Não informado",
+                Height: newerExam.Header.AlturaCm ?? 0
             ),
             Score: scoreComparison,
             Comparison: compositionComparison
