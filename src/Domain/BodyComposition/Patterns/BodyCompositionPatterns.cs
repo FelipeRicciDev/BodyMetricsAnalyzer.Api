@@ -5,7 +5,13 @@ public static class BodyCompositionPatterns
     #region Measurements
     public static readonly Regex Measurement =
         new(
-            @"(peso|massa gorda|massa óssea|massa proteica|água corporal|massa muscular|músculo esquelético)\s*" +
+            @"(peso|" +
+            @"massa gorda|" +
+            @"massa ossea|massa óssea|" +
+            @"massa proteica|" +
+            @"agua corporal|água corporal|" +
+            @"massa muscular|" +
+            @"musculo esquelético|músculo esquelético)\s*" +
             @"([\d]+(?:\.\d+)?)\s*\(([\d\.\-]+)\)",
             RegexOptions.IgnoreCase | RegexOptions.Compiled
         );
@@ -16,6 +22,11 @@ public static class BodyCompositionPatterns
             RegexOptions.IgnoreCase | RegexOptions.Compiled
         );
 
+    public static readonly Regex SkeletalMuscle =
+        new(
+            @"m[aou]scul[o]?\s+esquel[eé]tic[o]?\s+([\d]+(?:\.\d+)?)\s*\(([\d\.\-]+)\)",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled
+        );
     #endregion
 
     #region Header
@@ -44,9 +55,8 @@ public static class BodyCompositionPatterns
     #region Score
     public static readonly Regex BodyScore =
         new(
-            @"pontua[cç][aã]o\s+corporal[\s\S]{0,40}?\b(\d{1,3})\b[\s\S]{0,40}?(?:\/\s*100|pontos)",
+            @"pontua[cç][aã]o\s+corporal[\s\S]{0,60}?\b(\d{1,3})\b(?:\s*\/?\s*(\d{2,3}))?",
             RegexOptions.IgnoreCase | RegexOptions.Compiled
         );
-
     #endregion
 }

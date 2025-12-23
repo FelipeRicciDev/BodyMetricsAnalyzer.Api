@@ -25,15 +25,15 @@ public static class BodyCompositionParser
 
         foreach (Match match in BodyCompositionPatterns.Measurement.Matches(text))
         {
-            var nome = match.Groups[1].Value;
+            var rawName = match.Groups[1].Value;
+            var key = CompositionTextNormalizer.NormalizeKey(rawName);
 
-            items[CompositionTextNormalizer.NormalizeKey(nome)] =
-                new BodyCompositionItem
-                {
-                    Nome = nome,
-                    MedicaoKg = match.Groups[2].Value,
-                    Medidas = $"({match.Groups[3].Value})"
-                };
+            items[key] = new BodyCompositionItem
+            {
+                Nome = rawName,
+                MedicaoKg = match.Groups[2].Value.Replace(',', '.'),
+                Medidas = $"({match.Groups[3].Value})"
+            };
         }
 
         return items;
@@ -80,6 +80,23 @@ public static class BodyCompositionParser
             };
     }
 
+    public static BodyCompositionItem? ParseSkeletalMuscle(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return null;
+
+        var match = BodyCompositionPatterns.SkeletalMuscle.Match(text);
+
+        if (!match.Success)
+            return null;
+
+        return new BodyCompositionItem
+        {
+            Nome = "Músculo Esquelético",
+            MedicaoKg = match.Groups[1].Value,
+            Medidas = $"({match.Groups[2].Value})"
+        };
+    }
     #endregion
 
     #region Report Header Parsing
@@ -131,12 +148,17 @@ public static class BodyCompositionParser
     {
         var match = BodyCompositionPatterns.BodyScore.Match(text);
 
-        if (!match.Success) return new BodyScore(0, 100);
+        if (!match.Success)
+            return new BodyScore(0, 100);
 
-        return new BodyScore(
-            Pontuacao: int.Parse(match.Groups[1].Value),
-            Maximo: 100
-        );
+        var score = int.Parse(match.Groups[1].Value);
+
+        var max =
+            match.Groups.Count > 2 && match.Groups[2].Success
+                ? int.Parse(match.Groups[2].Value)
+                : 100;
+
+        return new BodyScore(score, max);
     }
     #endregion
 }

@@ -5,13 +5,26 @@ public static class BodyCompositionAnalyzer
     public static BodyCompositionExam Analyze(string rawText)
     {
         var normalized =
-            CompositionTextNormalizer.NormalizeOcrText(rawText);
+            string.IsNullOrWhiteSpace(rawText)
+            ? string.Empty
+            : CompositionTextNormalizer.NormalizeOcrText(rawText);
 
         var section =
             CompositionSectionExtractor.Extract(normalized);
 
-        var composition =
+        var skeletal =
+            BodyCompositionParser.ParseSkeletalMuscle(normalized);
+
+        var compositionFromSection =
             BodyCompositionParser.Parse(section);
+
+        var composition =
+            skeletal is not null
+                ? compositionFromSection with
+                {
+                    MusculoEsqueletico = skeletal
+                }
+                : compositionFromSection;
 
         var header =
             BodyCompositionParser.ParseHeader(normalized);

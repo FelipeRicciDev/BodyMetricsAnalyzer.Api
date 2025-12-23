@@ -11,7 +11,7 @@ public sealed class PdfImageExtractor
 
         using var reader = DocLib.Instance.GetDocReader(
             memory.ToArray(),
-            new PageDimensions(3000, 3000));
+            new PageDimensions(2000, 2000));
 
         for (int i = 0; i < reader.GetPageCount(); i++)
         {
@@ -20,7 +20,10 @@ public sealed class PdfImageExtractor
             var image = CreateImage(page);
 
             var imageStream = new MemoryStream();
-            image.SaveAsPng(imageStream);
+            image.SaveAsJpeg(imageStream, new JpegEncoder
+            {
+                Quality = 75
+            });
             imageStream.Position = 0;
 
             images.Add(imageStream);
@@ -57,6 +60,12 @@ public sealed class PdfImageExtractor
                     index += 4;
                 }
             }
+        });
+
+        image.Mutate(x =>
+        {
+            x.Grayscale();
+            x.Contrast(1.3f);
         });
 
         return image;

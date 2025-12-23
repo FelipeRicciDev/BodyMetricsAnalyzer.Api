@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace API.Services.Ocr;
+﻿namespace API.Services.Ocr;
 
 public sealed class OcrService
 {
@@ -22,7 +20,7 @@ public sealed class OcrService
             var psi = new ProcessStartInfo
             {
                 FileName = tesseractExe,
-                Arguments = $"{tempImage} {tempOut} -l por+eng --psm 6 --oem 1",
+                Arguments = $"{tempImage} {tempOut} -l por+eng --psm 4 --oem 1",
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,

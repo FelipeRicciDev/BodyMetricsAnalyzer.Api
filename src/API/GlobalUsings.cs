@@ -18,4 +18,7 @@ global using SixLabors.ImageSharp;
 global using SixLabors.ImageSharp.PixelFormats;
 global using System.Reflection;
 global using System.Text;
-global using Tesseract;
+global using UglyToad.PdfPig;
+global using SixLabors.ImageSharp.Formats.Jpeg;
+global using SixLabors.ImageSharp.Processing;
+global using System.Diagnostics;
