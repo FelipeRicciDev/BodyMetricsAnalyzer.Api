@@ -22,7 +22,7 @@ public sealed class OcrService
             var psi = new ProcessStartInfo
             {
                 FileName = tesseractExe,
-                Arguments = $"{tempImage} {tempOut} -l eng",
+                Arguments = $"{tempImage} {tempOut} -l por+eng --psm 6 --oem 1",
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,

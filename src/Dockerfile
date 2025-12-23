@@ -17,6 +17,7 @@ WORKDIR /app
 # 🔥 SOMENTE o Tesseract CLI (nada de Leptonica)
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
+    tesseract-ocr-por \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /out .
